@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from rest_framework.fields import CurrentUserDefault
+from rest_framework.validators import UniqueTogetherValidator
 
 from .models import Comment, Follow, Group, Post, User
 
@@ -51,10 +52,9 @@ class FollowSerializer(serializers.ModelSerializer):
         model = Follow
         fields = '__all__'
 
-    def validate(self, data):
-        following = data['following']
-        user = data['user']
-        follow = Follow.objects.filter(user=user, following=following)
-        if follow.exists():
-            raise serializers.ValidationError('Такая пара пользователь-подписчик уже существует')
-        return data
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Follow.objects.all(),
+                fields=['user', 'following']
+            )
+        ]

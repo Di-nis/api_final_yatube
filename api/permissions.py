@@ -4,6 +4,5 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 class OwnResourcePermission(BasePermission):
 
     def has_object_permission(self, request, view, obj):
-        if request.method in SAFE_METHODS:
-            return True
-        return request.user == obj.author
+        return (request.method in ['GET', 'OPTIONS', 'HEAD'] or
+                obj.author == request.user)
